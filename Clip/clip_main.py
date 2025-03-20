@@ -1,5 +1,16 @@
+"""
+실행 방법
+1. requirements.txt 설치
+    pip install -r requirements.txt
+2. 서버 실행
+    uvicorn main:app --reload
+3. 브라우저에서 접속
+    http://127.0.0.1:8000/docs 에서 API 확인
+ 4. 이미지 업로드 후 테스트
+"""
+
 from fastapi import FastAPI, File, UploadFile
-from PIL import Image
+from PIL import Image"
 import torch
 import clip
 import shutil
