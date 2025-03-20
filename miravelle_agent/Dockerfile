@@ -1,15 +1,12 @@
-# Python 3.11 베이스 이미지
 FROM python:3.11-slim
-
-# 작업 디렉토리 설정
 WORKDIR /app
 
-# 의존성 파일 복사 및 설치
-COPY ./app/requirements.txt .
+# requirements.txt만 먼저 복사하여 의존성 설치 (Docker 캐싱 활용)
+COPY ./src/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 애플리케이션 코드 복사
-COPY ./app .
+# 전체 소스코드를 /app으로 복사
+COPY ./src /app
 
-# FastAPI 실행
+# uvicorn을 실행할 때, main.py가 /app에 있으므로 모듈 경로는 "main:app"이어야 함
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
