@@ -13,7 +13,7 @@ import numpy as np
 app = FastAPI()
 nima_base = resnet50(weights=ResNet50_Weights.DEFAULT)
 
-# Redis 연결 (Docker 없이 직접 실행)
+# Redis 연결
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 # CLIP 모델 로드
@@ -57,7 +57,7 @@ def get_nima_score(image_path):
     
     image = Image.open(image_path)
     
-    # 🔥 RGBA (4채널) → RGB (3채널) 변환
+    # RGBA (4채널) → RGB (3채널) 변환
     if image.mode == "RGBA":
         image = image.convert("RGB")
 
@@ -69,15 +69,13 @@ def get_nima_score(image_path):
     mean_score = np.dot(scores, np.arange(1, 11))  # 평균 점수 계산
     return mean_score * 10  # 100점 기준 변환
 
-
 # 최적 모델 선택
-
 def get_best_model(image_files, input_text):
     best_model = None
     best_final_score = -1
 
     for image_path in image_files:
-        # 🔥 이미지 파일만 처리 ('.DS_Store' 같은 파일 제외)
+        # 이미지 파일만 처리 ('.DS_Store' 같은 파일 제외)
         if not image_path.lower().endswith((".png", ".jpg", ".jpeg")):
             print(f"무시된 파일: {image_path}")  # 디버깅 로그
             continue
@@ -116,6 +114,7 @@ async def select_best_model(keyword: str):
     else:
         print("적절한 모델을 찾지 못함")  # 모든 모델이 필터링되었는지 확인
         return {"message": "No suitable model found"}
+
 
 # 서버 실행: uvicorn main:app --reload
 """"
