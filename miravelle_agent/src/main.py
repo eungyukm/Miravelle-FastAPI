@@ -4,10 +4,11 @@ import redis
 from langchain_openai import OpenAI, ChatOpenAI
 from pydantic import BaseModel
 
-from agent.agent_core import Agent
-from schemas.agent_schemas import  AgentRequest, AgentResponse
+from agent.agent_core import rotuer as agent_router
 
 app = FastAPI(title="FastAPI with Redis and LangChain")
+
+app.include_router(agent_router)
 
 redis_client = redis.Redis(host='redis', port=6379, decode_responses=True)
 
@@ -39,14 +40,3 @@ async def call_llm(input_data: TextInput):
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM 호출 실패: {e}")
-
-# 에이전트 인스턴스 생성
-agent_instance = Agent()
-
-@app.post("/agent", response_model=AgentResponse)
-async def call_agent(input_data: AgentRequest):
-    try:
-        result = agent_instance.process(input_data.prompt)
-        return AgentResponse(response=result)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"에이전트 호출 실패: {e}")
