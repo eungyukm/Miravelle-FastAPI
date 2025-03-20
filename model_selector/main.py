@@ -1,6 +1,6 @@
 import os
 from fastapi import FastAPI
-import redis
+import memory_agent
 import clip
 import torch
 from PIL import Image
@@ -14,7 +14,7 @@ app = FastAPI()
 # Redis 연결 (환경 변수 사용)
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")  # 기본값: localhost
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+redis_client = memory_agent.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 # CLIP 모델 로드
 device = "cuda" if torch.cuda.is_available() else "cpu"
