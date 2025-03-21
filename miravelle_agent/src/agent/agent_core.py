@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from schemas.agent_schemas import AgentRequest, AgentResponse
 
 # 라우터 생성
-rotuer = APIRouter()
+router = APIRouter()
 
 class Agent:
     def __init__(self):
@@ -16,7 +16,7 @@ class Agent:
 # 에이전트 인스턴스 생성
 agent_instance = Agent()
 
-@rotuer.post("/agent", response_model=AgentResponse)
+@router.post("/agent", response_model=AgentResponse)
 async def call_agent(input_data: AgentRequest):
     try:
         result = agent_instance.process(input_data.prompt)

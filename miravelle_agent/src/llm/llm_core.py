@@ -3,13 +3,13 @@ from langchain_openai import OpenAI, ChatOpenAI
 
 from schemas.llm_schemas import TextInput
 
-rotuer = APIRouter()
+router = APIRouter()
 
 # LLM 및 Chat 모델 객체 생성
 llm = OpenAI()
 chat_model = ChatOpenAI()
 
-@rotuer.post("/llm")
+@router.post("/llm")
 async def call_llm(input_data: TextInput):
     try:
         response = llm.invoke(input_data.text)

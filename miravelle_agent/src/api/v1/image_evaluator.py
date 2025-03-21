@@ -1,10 +1,10 @@
-from fastapi import FastAPI, File, UploadFile
-from PIL import Image"
+from fastapi import APIRouter, File, UploadFile
+from PIL import Image
 import torch
 import clip
 import shutil
 
-app = FastAPI()
+router = APIRouter()
 
 # CLIP 모델 로드
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -22,8 +22,7 @@ def evaluate_image(image_path: str, prompts: list):
     similarity = (image_features @ text_features.T).softmax(dim=-1)
     return float(similarity[0][0])  # 높은 점수가 좋은 이미지
 
-
-@app.post("/evaluate/")
+@router.post("/evaluate")
 async def upload_and_evaluate_image(file: UploadFile = File(...)):
     file_path = f"uploaded_{file.filename}"
 
@@ -83,14 +82,3 @@ async def upload_and_evaluate_image(file: UploadFile = File(...)):
         },
         "평가 이유": reason
     }
-
-"""
-실행 방법
-1. requirements.txt 설치
-    pip install -r requirements.txt
-2. 서버 실행
-    uvicorn main:app --reload
-3. 브라우저에서 접속
-    http://127.0.0.1:8000/docs 에서 API 확인
- 4. 이미지 업로드 후 테스트
-"""
