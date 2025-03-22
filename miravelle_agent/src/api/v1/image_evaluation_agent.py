@@ -1,6 +1,8 @@
 import io
 import requests
 from fastapi import APIRouter, HTTPException
+
+from schemas.llm_schemas import CommandRequest
 from services.get_evaluation_image import get_evaluation_image_random
 
 import clip
@@ -105,7 +107,6 @@ def get_image_from_api(tool_input=None):
     else:
         return "Failed to load image"
 
-@router.get("/v1/get-image/")
 def get_image():
     result = get_image_from_api.invoke({})
     if "Image" in result:
@@ -123,3 +124,13 @@ def get_image():
         }
     else:
         return {"error": "Failed to load image"}
+
+@router.post("/v1/process-command")
+def process_command(request: CommandRequest):
+    try:
+        if request.command == "랜덤한 이미지 가져와서 NIMA로 평가하고 허깅페이스에 업로드 해줘":
+            return get_image()
+        else:
+            return {"status": "error", "message": "Unknown command"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
