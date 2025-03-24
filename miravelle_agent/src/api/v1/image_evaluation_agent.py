@@ -26,6 +26,8 @@ from base64 import b64encode
 import json
 
 from schemas.llm_schemas import CommandRequest
+from agent.tools import get_image_from_miravell_tool
+from services.image_evaluation import get_image_from_miravell
 
 # 환경 변수 로드
 load_dotenv()
@@ -193,15 +195,19 @@ def get_image_from_api():
 # LangChain 설정 (단일 입력값으로 수정)
 tools = [
     get_image_from_api,
-    upload_to_huggingface
+    upload_to_huggingface,
+    get_image_from_miravell_tool,
 ]
 
 agent = initialize_agent(
     tools=tools,
-    llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
+    llm=ChatOpenAI(model="gpt-4o", temperature=0),
     agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True
+    verbose=True,
 )
+
+# Tool 등록 상태 출력
+print(f"Registered Tools: {[tool.name for tool in tools]}")
 
 @router.post("/v1/process-command")
 def process_command(request: CommandRequest):
@@ -209,7 +215,7 @@ def process_command(request: CommandRequest):
     에이전트를 통해 명령을 처리합니다.
     """
     try:
-        result = agent.run(request.command)
+        result = agent.invoke(request.command)
         return {"status": "success", "result": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -243,3 +249,7 @@ def evaluate_and_upload():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"이미지 평가 및 업로드에 실패했습니다: {str(e)}")
 
+@router.post("/v1/evaluate_image_from_miravell")
+async def evaluate_image_from_miravell():
+    result = await get_image_from_miravell()
+    return f"API 응답: {result}"
