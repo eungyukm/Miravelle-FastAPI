@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 import google.generativeai as genai
-from schemas.model_schemas import VideoInput, EvaluationResponse
+from src.schemas.model_schemas import VideoInput, EvaluationResponse
 import os
 from dotenv import load_dotenv
 import re

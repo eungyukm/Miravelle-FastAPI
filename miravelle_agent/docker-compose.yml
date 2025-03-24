@@ -6,13 +6,14 @@ services:
       - "8000:8000"
     # 로컬의 src 폴더를 컨테이너의 /app에 마운트합니다.
     volumes:
-      - ./src:/app
+      - .:/app
     depends_on:
       - redis
     env_file:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
     restart: unless-stopped
 
   redis:

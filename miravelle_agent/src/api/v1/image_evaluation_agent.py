@@ -1,8 +1,7 @@
 import io
 import requests
 from fastapi import APIRouter, HTTPException
-from services.get_evaluation_image import get_evaluation_image_random
-
+from src.services.get_evaluation_image import get_evaluation_image_random
 import clip
 import torch
 from PIL import Image
@@ -11,7 +10,6 @@ from torchvision.models import resnet50, ResNet50_Weights
 import torch.nn as nn
 import numpy as np
 from base64 import b64encode
-
 from langchain.agents import tool
 
 router = APIRouter()

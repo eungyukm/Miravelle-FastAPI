@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from schemas.agent_schemas import AgentRequest, AgentResponse
+from src.schemas.agent_schemas import AgentRequest, AgentResponse
 
 # 라우터 생성
 router = APIRouter()
