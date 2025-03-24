@@ -30,7 +30,10 @@ from schemas.llm_schemas import CommandRequest
 
 # agent tool
 from agent.tools import get_image_from_miravell_tool
+
+# service
 from services.image_evaluation import get_image_from_miravell
+from services.nima_rating import calculate_nima_score
 
 from services.utils import get_evaluation_image_random
 
@@ -54,26 +57,6 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # CLIP 모델 로드
 clip_model, preprocess = clip.load("ViT-B/32", device=device)
 
-
-# NIMA 모델 정의 및 로드
-class NIMA(nn.Module):
-    def __init__(self, base_model):
-        super(NIMA, self).__init__()
-        self.base_model = base_model
-        self.fc = nn.Linear(1000, 10)
-
-    def forward(self, x):
-        x = self.base_model(x)
-        x = self.fc(x)
-        return torch.softmax(x, dim=1)
-
-
-# NIMA 모델 로드
-nima_base = resnet50(weights=ResNet50_Weights.DEFAULT)
-nima_model = NIMA(nima_base).to(device)
-nima_model.eval()
-
-
 # CLIP 평가 함수
 def get_clip_score(image, input_text="default"):
     """
@@ -88,24 +71,6 @@ def get_clip_score(image, input_text="default"):
 
     # 점수를 1과 10 사이로 제한
     return max(1, min(10, clip_score))
-
-
-# NIMA 평가 함수
-def get_nima_score(image):
-    """
-    입력 이미지에 대한 NIMA 점수를 계산합니다.
-    """
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    image_tensor = transform(image).unsqueeze(0).to(device)
-    with torch.no_grad():
-        scores = nima_model(image_tensor).cpu().numpy()[0]
-    mean_score = np.dot(scores, np.arange(1, 11))
-    return float(round(mean_score, 2))  # float으로 변환하여 반환
-
 
 # 평가 엔드포인트
 @router.get("/v1/evaluate-random-image")
@@ -123,7 +88,7 @@ def evaluate_random_image():
             image = image.convert("RGB")
 
         clip_score = get_clip_score(image)
-        nima_score = get_nima_score(image)
+        nima_score = calculate_nima_score(image)
         encoded_image = b64encode(image_data).decode("utf-8")
 
         return {
@@ -240,7 +205,7 @@ def evaluate_and_upload():
             image = image.convert("RGB")
 
         # NIMA 점수 계산
-        nima_score = get_nima_score(image)
+        nima_score = calculate_nima_score(image)
 
         # 허깅페이스에 업로드
         upload_result = upload_to_huggingface.invoke({"score": nima_score, "image_data": image_data})
@@ -304,7 +269,7 @@ def evaluate_miravelle_image():
             logger.info("➡ CLIP 및 NIMA 점수 계산 시작")
             try:
                 clip_score = get_clip_score(image)
-                nima_score = get_nima_score(image)
+                nima_score = calculate_nima_score(image)
                 logger.info(f"CLIP 점수: {clip_score}, NIMA 점수: {nima_score}")
             except Exception as e:
                 logger.error(f"점수 계산 실패: {str(e)}")
