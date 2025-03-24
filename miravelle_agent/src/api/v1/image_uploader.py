@@ -3,7 +3,7 @@ from enum import Enum
 from PIL import Image
 import io
 
-from src.models.predictor import predict
+from models.predictor import predict
 router = APIRouter()
 
 class Task(str, Enum):

@@ -1,7 +1,7 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-from src.models.common import Classifier2Class
+from models.common import SimpleCNN
 
 CLASS_NAMES = {
     "texture": ["전", "후"],
@@ -23,7 +23,7 @@ transform = transforms.Compose([
 ])
 
 def load_model(task: str):
-    model = Classifier2Class()
+    model = SimpleCNN()
     model.load_state_dict(torch.load(MODEL_FILES[task], map_location="cpu"))
     model.eval()
     return model

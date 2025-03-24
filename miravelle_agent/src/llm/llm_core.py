@@ -1,6 +1,6 @@
 from fastapi import HTTPException, APIRouter
 from langchain_openai import OpenAI, ChatOpenAI
-from src.schemas.llm_schemas import TextInput
+from schemas.llm_schemas import TextInput
 
 router = APIRouter()
 

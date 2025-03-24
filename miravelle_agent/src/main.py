@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from src.agent.agent_core import router as agent_router
-from src.llm.llm_core import router as llm_router
-from src.memory_agent.redis_core import router as memory_agent_router
-from src.api.v1.gemini import router as gemini_router
-from src.api.v1.image_evaluator import router as image_router
-from src.api.v1.model_selector import router as model_router
-from src.api.v1.image_evaluation_agent import router as image_evaluation_agent_router
-from src.api.v1.image_uploader import router as upload_router
+from agent.agent_core import router as agent_router
+from llm.llm_core import router as llm_router
+from memory_agent.redis_core import router as memory_agent_router
+from api.v1.gemini import router as gemini_router
+from api.v1.image_evaluator import router as image_router
+from api.v1.model_selector import router as model_router
+from api.v1.image_evaluation_agent import router as image_evaluation_agent_router
+from api.v1.image_uploader import router as upload_router
 
 
 app = FastAPI()
