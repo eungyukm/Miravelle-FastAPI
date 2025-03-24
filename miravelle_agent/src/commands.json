@@ -1,4 +1,5 @@
 {
   "command_1": "랜덤 이미지를 가져와서 NIMA로 평가하고 허깅페이스에 업로드합니다.",
-  "command_2": "miravelle에서 이미지 가져와"
+  "command_2": "miravelle에서 이미지 가져와",
+  "command_3": "Miravelle 이미지를 평가하고 결과를 저장합니다."
 }

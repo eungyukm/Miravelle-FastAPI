@@ -7,15 +7,11 @@ CLIP 및 NIMA 모델을 활용하여 이미지를 평가하며, LangChain을 통
 import io
 
 import httpx
-import requests
 from fastapi import FastAPI, HTTPException, APIRouter
-from langchain_community.chat_models import ChatOpenAI
-from langchain.agents import initialize_agent, tool, AgentType
+
 
 from PIL import Image
 from base64 import b64encode
-
-from schemas.llm_schemas import CommandRequest
 
 # agent tool
 from agent.tools_core import get_image_from_miravell_tool, upload_to_huggingface, get_image_from_api
@@ -62,33 +58,7 @@ def evaluate_random_image():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"이미지 평가에 실패했습니다: {str(e)}")
 
-# LangChain 설정 (단일 입력값으로 수정)
-tools = [
-    get_image_from_api,
-    upload_to_huggingface,
-    get_image_from_miravell_tool,
-]
 
-agent = initialize_agent(
-    tools=tools,
-    llm=ChatOpenAI(model="gpt-4o", temperature=0),
-    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True,
-)
-
-# Tool 등록 상태 출력
-print(f"Registered Tools: {[tool.name for tool in tools]}")
-
-@router.post("/v1/process-command")
-def process_command(request: CommandRequest):
-    """
-    에이전트를 통해 명령을 처리합니다.
-    """
-    try:
-        result = agent.invoke(request.command)
-        return {"status": "success", "result": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/v1/evaluate-and-upload")
 def evaluate_and_upload():
