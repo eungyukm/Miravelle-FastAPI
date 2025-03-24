@@ -10,7 +10,6 @@ import io
 import httpx
 import requests
 from fastapi import FastAPI, HTTPException, APIRouter
-from pydantic import BaseModel
 from dotenv import load_dotenv
 from huggingface_hub import HfApi
 from langchain_community.chat_models import ChatOpenAI
@@ -32,6 +31,8 @@ from schemas.llm_schemas import CommandRequest
 # agent tool
 from agent.tools import get_image_from_miravell_tool
 from services.image_evaluation import get_image_from_miravell
+
+from services.utils import get_evaluation_image_random
 
 import logging
 
@@ -104,14 +105,6 @@ def get_nima_score(image):
         scores = nima_model(image_tensor).cpu().numpy()[0]
     mean_score = np.dot(scores, np.arange(1, 11))
     return float(round(mean_score, 2))  # float으로 변환하여 반환
-
-
-# 랜덤 이미지 다운로드 함수
-def get_evaluation_image_random():
-    response = requests.get("https://picsum.photos/200/300")
-    if response.status_code == 200:
-        return response.content
-    return None
 
 
 # 평가 엔드포인트
