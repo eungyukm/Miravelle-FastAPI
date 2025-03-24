@@ -18,7 +18,7 @@ from base64 import b64encode
 from schemas.llm_schemas import CommandRequest
 
 # agent tool
-from agent.tools import get_image_from_miravell_tool, upload_to_huggingface
+from agent.tools_core import get_image_from_miravell_tool, upload_to_huggingface, get_image_from_api
 
 # service
 from services.image_evaluation import get_image_from_miravell
@@ -61,24 +61,6 @@ def evaluate_random_image():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"이미지 평가에 실패했습니다: {str(e)}")
-
-# LangChain Tool 설정 (입력값 제거)
-@tool(return_direct=True)
-def get_image_from_api():
-    """
-    랜덤 이미지를 가져와서 평가합니다.
-    """
-    url = "http://127.0.0.1:8000/v1/evaluate-random-image"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        clip_score = data.get("clip_score")
-        nima_score = data.get("nima_score")
-        encoded_image = data.get("image_data")
-        return f"CLIP 점수: {clip_score}, NIMA 점수: {nima_score}\n이미지: {encoded_image}"
-    else:
-        return "이미지를 불러오지 못했습니다."
-
 
 # LangChain 설정 (단일 입력값으로 수정)
 tools = [

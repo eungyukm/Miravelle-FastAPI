@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 # tools
 from .huggingface_tool import upload_to_huggingface
+from .get_image_tool import get_image_from_api
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
