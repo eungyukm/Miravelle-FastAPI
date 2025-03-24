@@ -249,7 +249,7 @@ def evaluate_and_upload():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"이미지 평가 및 업로드에 실패했습니다: {str(e)}")
 
-@router.post("/v1/evaluate_image_from_miravell")
+@router.post("/v1/evaluate-image-from-miravell")
 async def evaluate_image_from_miravell():
     result = await get_image_from_miravell()
     return f"API 응답: {result}"
