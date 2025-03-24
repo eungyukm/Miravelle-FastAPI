@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 전체 소스코드를 /app으로 복사
 COPY ./src /app
 
+# commands.json 파일을 명시적으로 복사
+COPY ./src/commands.json /app/commands.json
+
 # uvicorn을 실행할 때, main.py가 /app에 있으므로 모듈 경로는 "main:app"이어야 함
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-# CMD ["sleep", "3600"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

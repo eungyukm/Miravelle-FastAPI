@@ -7,6 +7,7 @@ services:
     # 로컬의 src 폴더를 컨테이너의 /app에 마운트합니다.
     volumes:
       - ./src:/app
+      - ./src/commands.json:/app/commands.json # 명령어 파일 개별 마운트
     depends_on:
       - redis
     env_file:
