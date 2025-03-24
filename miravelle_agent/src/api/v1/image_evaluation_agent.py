@@ -4,26 +4,21 @@
 CLIP 및 NIMA 모델을 활용하여 이미지를 평가하며, LangChain을 통해 에이전트를 초기화하고 명령을 처리합니다.
 """
 
-import os
 import io
 
 import httpx
 import requests
 from fastapi import FastAPI, HTTPException, APIRouter
-from dotenv import load_dotenv
-from huggingface_hub import HfApi
 from langchain_community.chat_models import ChatOpenAI
 from langchain.agents import initialize_agent, tool, AgentType
 
 from PIL import Image
 from base64 import b64encode
 
-import json
-
 from schemas.llm_schemas import CommandRequest
 
 # agent tool
-from agent.tools import get_image_from_miravell_tool
+from agent.tools import get_image_from_miravell_tool, upload_to_huggingface
 
 # service
 from services.image_evaluation import get_image_from_miravell
@@ -37,12 +32,6 @@ import logging
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# 환경 변수 로드
-load_dotenv()
-
-HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
-DATASET_REPO = os.getenv("DATASET_REPO")
 
 router = APIRouter()
 
@@ -72,49 +61,6 @@ def evaluate_random_image():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"이미지 평가에 실패했습니다: {str(e)}")
-
-
-# 허깅페이스 업로드 함수
-@tool(return_direct=True)
-def upload_to_huggingface(score, image_data):
-    """
-    평가 점수와 이미지를 허깅페이스 데이터셋에 업로드합니다.
-    """
-    api = HfApi()
-
-    # 데이터셋 디렉토리 생성
-    os.makedirs("dataset", exist_ok=True)
-
-    # 이미지 파일 저장
-    image_file = "dataset/evaluated_image.jpg"
-    with open(image_file, "wb") as img_f:
-        img_f.write(image_data)
-
-    # 점수 데이터 저장
-    data = {"score": score}
-    dataset_file = "dataset/nima_scores.jsonl"
-    with open(dataset_file, "a") as f:
-        f.write(json.dumps(data) + "\n")
-
-    # 허깅페이스에 파일 업로드
-    api.upload_file(
-        path_or_fileobj=dataset_file,
-        path_in_repo="nima_scores.jsonl",
-        repo_id=DATASET_REPO,
-        repo_type="dataset",
-        token=HUGGINGFACE_TOKEN
-    )
-
-    api.upload_file(
-        path_or_fileobj=image_file,
-        path_in_repo="evaluated_image.jpg",
-        repo_id=DATASET_REPO,
-        repo_type="dataset",
-        token=HUGGINGFACE_TOKEN
-    )
-
-    return f"점수 {score}와 이미지가 {DATASET_REPO}에 업로드되었습니다."
-
 
 # LangChain Tool 설정 (입력값 제거)
 @tool(return_direct=True)
