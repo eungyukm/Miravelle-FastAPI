@@ -63,10 +63,13 @@ FastAPI 프로젝트를 효율적으로 관리하고 유지보수하기 위한 �
 - SQLAlchemy 모델 정의
 
 ### 4. `schemas`
-- schema는 **접미사 `schemas`를 반드시 추가**  
+- schema는 **접미사 `schemas`를 반드시 추가**
 
 ### 5. `services`
 - 서비스 레이어에서 비즈니스 로직 처리  
+- 외부 API 호출
+- 파일 처리 및 변환
+- 모델 학습, 예측
 
 ### 6. `crud`
 - 데이터베이스에서의 CRUD 작업 정의  
