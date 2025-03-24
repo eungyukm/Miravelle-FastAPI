@@ -15,8 +15,6 @@ from huggingface_hub import HfApi
 from langchain_community.chat_models import ChatOpenAI
 from langchain.agents import initialize_agent, tool, AgentType
 
-import clip
-import torch
 from PIL import Image
 from base64 import b64encode
 
@@ -30,6 +28,7 @@ from agent.tools import get_image_from_miravell_tool
 # service
 from services.image_evaluation import get_image_from_miravell
 from services.nima_rating import calculate_nima_score
+from services.clip_rating import calculate_clip_score
 
 from services.utils import get_evaluation_image_random
 
@@ -47,27 +46,6 @@ DATASET_REPO = os.getenv("DATASET_REPO")
 
 router = APIRouter()
 
-# 디바이스 설정 (GPU 사용 가능 시 GPU 사용)
-device = "cuda" if torch.cuda.is_available() else "cpu"
-
-# CLIP 모델 로드
-clip_model, preprocess = clip.load("ViT-B/32", device=device)
-
-# CLIP 평가 함수
-def get_clip_score(image, input_text="default"):
-    """
-    입력 이미지와 텍스트에 대한 CLIP 점수를 계산합니다.
-    """
-    text_features = clip_model.encode_text(clip.tokenize(input_text).to(device))
-    image_tensor = preprocess(image).unsqueeze(0).to(device)
-    image_features = clip_model.encode_image(image_tensor)
-
-    similarity = torch.cosine_similarity(text_features, image_features).item()
-    clip_score = similarity * 5 + 5
-
-    # 점수를 1과 10 사이로 제한
-    return max(1, min(10, clip_score))
-
 # 평가 엔드포인트
 @router.get("/v1/evaluate-random-image")
 def evaluate_random_image():
@@ -83,7 +61,7 @@ def evaluate_random_image():
         if image.mode == "RGBA":
             image = image.convert("RGB")
 
-        clip_score = get_clip_score(image)
+        clip_score = calculate_clip_score(image)
         nima_score = calculate_nima_score(image)
         encoded_image = b64encode(image_data).decode("utf-8")
 
@@ -264,7 +242,7 @@ def evaluate_miravelle_image():
             # CLIP 및 NIMA 점수 계산
             logger.info("➡ CLIP 및 NIMA 점수 계산 시작")
             try:
-                clip_score = get_clip_score(image)
+                clip_score = calculate_clip_score(image)
                 nima_score = calculate_nima_score(image)
                 logger.info(f"CLIP 점수: {clip_score}, NIMA 점수: {nima_score}")
             except Exception as e:
