@@ -8,7 +8,12 @@ from api.v1.image_evaluator import router as image_router
 from api.v1.model_selector import router as model_router
 from api.v1.image_evaluation_agent import router as image_evaluation_agent_router
 
-app = FastAPI(title="FastAPI with Redis and LangChain, and CLIP, and NIMA")
+# scheduler
+from scheduler.scheduler_core import scheduler_context
+
+
+# FastAPI 애플리케이션 생성 및 lifespan 설정
+app = FastAPI(title="FastAPI with Redis and LangChain, CLIP, and NIMA", lifespan=scheduler_context)
 
 app.include_router(agent_router)
 app.include_router(llm_router)
