@@ -3,6 +3,9 @@
 # 요구 사항
 Docker와 Docker Compose가 설치되어 있어야 합니다.
 
+# 프로젝트 구조
+[프로젝트 구조](Docs/structure/fastapi_project_structure.md)
+
 # 실행
 Docker Compose를 사용해 FaseAPI와 Redis를 동시에 실행합니다.
 ```
