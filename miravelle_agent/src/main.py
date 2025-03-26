@@ -7,6 +7,7 @@ from api.v1.gemini import router as gemini_router
 from api.v1.image_evaluator import router as image_router
 from api.v1.model_selector import router as model_router
 from api.v1.image_evaluation_agent import router as image_evaluation_agent_router
+from api.v1.nima_predictor import router as nima_router
 
 # scheduler
 from scheduler.scheduler_core import scheduler_context
@@ -22,3 +23,4 @@ app.include_router(gemini_router, prefix="/model")
 app.include_router(image_router, prefix="/image")
 app.include_router(model_router, prefix="/model-selector")
 app.include_router(image_evaluation_agent_router)
+app.include_router(nima_router, prefix="/nima")
