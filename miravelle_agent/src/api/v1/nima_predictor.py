@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
-from torchvision import models, transforms
-from PIL import Image
+from torchvision import models
 
 class NIMARegressionModel(nn.Module):
     def __init__(self):
@@ -22,7 +21,7 @@ class NIMARegressionModel(nn.Module):
         return x.squeeze()
 
 # 모델 로드 함수
-def load_nima_model(path="nima_regression_model/pytorch_model.bin"):
+def load_nima_model(path="model/nima_regression_model.pth"):
     model = NIMARegressionModel()
     state_dict = torch.load(path, map_location="cpu")
     model.load_state_dict(state_dict)
